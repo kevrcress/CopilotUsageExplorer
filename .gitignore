@@ -1,0 +1,20 @@
+node_modules
+dist
+dist-ssr
+*.local
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+coverage
+.env
+.env.local
+*.tsbuildinfo
+
+# Real personal Copilot debug logs used for local dev/testing — never commit.
+# Sample data for the app lives in Examples/ (tracked); this is a separate,
+# real-data folder that must stay private.
+examples/
+
+# Not source — a redundant project snapshot and personal training material.
+UpdatedCopilotUsageExplorer.zip
+Copilot 101 And Optimization.pdf

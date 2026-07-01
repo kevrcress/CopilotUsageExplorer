@@ -1,0 +1,16 @@
+[
+  {
+    "id": "claude-opus-4.6",
+    "name": "Claude Opus 4.6",
+    "vendor": "Anthropic",
+    "billing": { "is_premium": true, "multiplier": 3, "restricted_to": ["business", "enterprise"] },
+    "capabilities": { "family": "claude-opus-4.6", "tokenizer": "o200k_base", "type": "chat" }
+  },
+  {
+    "id": "gpt-4.1",
+    "name": "GPT-4.1",
+    "vendor": "OpenAI",
+    "billing": { "is_premium": false, "multiplier": 0 },
+    "capabilities": { "family": "gpt-4.1", "type": "chat" }
+  }
+]

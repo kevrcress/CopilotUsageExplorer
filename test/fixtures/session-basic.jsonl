@@ -1,0 +1,10 @@
+{"v":1,"ts":1700000000000,"dur":0,"sid":"test-sess-1","type":"session_start","name":"session_start","spanId":"session-start-1","status":"ok","attrs":{"copilotVersion":"0.45.0","vscodeVersion":"1.117.0"}}
+{"ts":1700000000010,"dur":0,"sid":"test-sess-1","type":"user_message","name":"user_message","spanId":"u1","status":"ok","attrs":{"content":"hello"}}
+{"ts":1700000000020,"dur":0,"sid":"test-sess-1","type":"turn_start","name":"turn_start:0","spanId":"ts-0","status":"ok","attrs":{"turnId":"0"}}
+{"ts":1700000000030,"dur":150,"sid":"test-sess-1","type":"llm_request","name":"llm_request","spanId":"llm-0","parentSpanId":"ts-0","status":"ok","attrs":{"model":"claude-opus-4.6","inputTokens":1000,"outputTokens":200,"ttft":50,"maxTokens":32000,"systemPromptFile":"system_prompt_0.json","toolsFile":"tools_0.json","userRequest":"[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"hi\",\"cache_control\":{\"type\":\"ephemeral\"}}]}]"}}
+{"ts":1700000000200,"dur":5,"sid":"test-sess-1","type":"tool_call","name":"read_file","spanId":"tc-0","parentSpanId":"llm-0","status":"ok","attrs":{"args":"{\"path\":\"/x\"}","result":"file contents"}}
+{"ts":1700000000300,"dur":2,"sid":"test-sess-1","type":"tool_call","name":"run_in_terminal","spanId":"tc-1","parentSpanId":"llm-0","status":"error","attrs":{"args":"{}","result":null,"error":"command not found"}}
+{"ts":1700000000400,"dur":80,"sid":"test-sess-1","type":"llm_request","name":"llm_request","spanId":"llm-1","parentSpanId":"ts-0","status":"ok","attrs":{"model":"gpt-4.1","inputTokens":500,"outputTokens":100,"ttft":40}}
+{"ts":1700000000500,"dur":0,"sid":"test-sess-1","type":"agent_response","name":"agent_response","spanId":"ar-0","parentSpanId":"ts-0","status":"ok","attrs":{"response":[{"type":"text","text":"done"}]}}
+{"ts":1700000000600,"dur":0,"sid":"test-sess-1","type":"turn_end","name":"turn_end:0","spanId":"te-0","status":"ok","attrs":{"turnId":"0"}}
+{"ts":1700000000700,"dur":0,"sid":"test-sess-1","type":"child_session_ref","name":"child_session_ref","spanId":"cr-0","status":"ok","attrs":{"childSessionId":"child-1","childLogFile":"title-child-1.jsonl","label":"title generation"}}
