@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Local browser-based viewer for GitHub Copilot Chat agent debug logs (token + premium-request analytics).",
+  "description": "Local browser-based viewer for GitHub Copilot Chat agent debug logs (token usage + optimization insights).",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

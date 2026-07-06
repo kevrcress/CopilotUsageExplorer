@@ -21,7 +21,7 @@ npm run build        # static bundle in dist/  (deploy to GitHub Pages)
 
 In VS Code (Copilot Chat 0.45+):
 
-1. Settings → search for **`github.copilot.chat.agent.debugLog.fileLogging`** → enable.
+1. Settings → search for **`github.copilot.chat.agentDebugLog.fileLogging.enabled`** → enable.
 2. Restart Copilot Chat (or VS Code).
 3. New sessions write to:
    - **Windows:** `%APPDATA%\Code\User\workspaceStorage\<workspaceHash>\GitHub.copilot-chat\debug-logs\<sessionId>\`

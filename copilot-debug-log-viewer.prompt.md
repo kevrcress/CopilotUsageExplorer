@@ -1,7 +1,7 @@
 # Build a Copilot Chat Debug Log Viewer
 
 ## Goal
-Build a local, browser-based UI tool to ingest and analyze GitHub Copilot Chat **agent debug log** files (JSONL) emitted by VS Code when the setting `github.copilot.chat.agent.debugLog.fileLogging` is enabled.
+Build a local, browser-based UI tool to ingest and analyze GitHub Copilot Chat **agent debug log** files (JSONL) emitted by VS Code when the setting `github.copilot.chat.agentDebugLog.fileLogging.enabled` is enabled.
 
 The primary purpose is to give an **individual developer** detailed, **tokens-only** visibility into:
 
