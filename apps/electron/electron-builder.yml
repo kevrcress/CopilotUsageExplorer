@@ -1,0 +1,26 @@
+# Packaging config for the Electron host.
+# Windows NSIS + GitHub Releases auto-update is the supported path.
+# Builds are UNSIGNED: Windows SmartScreen will warn on first run
+# ("More info" -> "Run anyway"). Document this in install instructions.
+appId: com.kevrcress.copilot-usage-explorer
+productName: Copilot Usage Explorer
+directories:
+  output: release
+files:
+  - out/**
+  - package.json
+win:
+  target: nsis
+nsis:
+  oneClick: true
+  deleteAppDataOnUninstall: false
+mac:
+  # Opt-in unsigned manual-install build (npm run build:mac-unsigned).
+  # No signing identity -> no macOS auto-update; users replace the app manually.
+  target: zip
+  identity: null
+publish:
+  provider: github
+  owner: kevrcress
+  repo: CopilotUsageExplorer
+npmRebuild: false

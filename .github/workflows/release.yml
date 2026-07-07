@@ -1,0 +1,75 @@
+# Release: pushing a version tag (v*) builds the .vsix and the Windows NSIS
+# installer and attaches both to a GitHub Release.
+#
+# Consumers of the Release:
+#   - VS Code extension update check (apps/vscode-ext/src/update-check.ts)
+#     reads /releases/latest and compares tag_name — prerelease tags
+#     (anything with a "-", e.g. v0.2.0-rc.1) are marked prerelease below and
+#     are therefore invisible to /releases/latest. Use one for dry runs.
+#   - electron-updater reads latest.yml + the .exe/.blockmap assets, so all
+#     three electron-builder outputs must be attached.
+#
+# The tag must match the root package.json version exactly (single source of
+# truth); the sync-version step fails the run otherwise.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # windows-latest: electron-builder must run on Windows to produce the
+    # NSIS installer; tests + vsce also run here so one job gates the Release.
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify tag matches root version, stamp app manifests
+        shell: bash
+        run: node scripts/sync-version.mjs --expect "${GITHUB_REF_NAME#v}"
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build web app (guard)
+        run: npm run build -w apps/web
+
+      - name: Package VS Code extension (.vsix)
+        run: npm run package -w apps/vscode-ext
+
+      - name: Build Windows installer (NSIS)
+        run: npm run build:win -w apps/electron
+
+      - name: Verify artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls apps/vscode-ext/copilot-usage-explorer-*.vsix
+          ls apps/electron/release/*.exe
+          ls apps/electron/release/*.blockmap
+          ls apps/electron/release/latest.yml
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apps/vscode-ext/copilot-usage-explorer-*.vsix
+            apps/electron/release/*.exe
+            apps/electron/release/*.blockmap
+            apps/electron/release/latest.yml
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true

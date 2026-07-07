@@ -1,0 +1,31 @@
+{
+  "name": "@cue/ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Shared React UI for Copilot Usage Explorer. Host-specific IO lives behind the adapter interfaces in src/host.ts.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./adapters/dexie-cache": "./src/adapters/dexie-cache.ts"
+  },
+  "dependencies": {
+    "@cue/core": "*",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.1.4",
+    "@tanstack/react-table": "^8.20.5",
+    "@tanstack/react-virtual": "^3.10.8",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "dexie": "^4.4.4",
+    "lucide-react": "^0.453.0",
+    "recharts": "^2.13.0",
+    "tailwind-merge": "^2.5.4",
+    "zustand": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

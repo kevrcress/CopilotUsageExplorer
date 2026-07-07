@@ -1,0 +1,37 @@
+{
+  "name": "@cue/electron",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Electron desktop host for Copilot Usage Explorer (auto-discovers VS Code Copilot debug logs).",
+  "author": "Kevin Cress",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "typecheck": "tsc -p tsconfig.node.json && tsc -p tsconfig.web.json",
+    "build": "npm run typecheck && electron-vite build",
+    "start": "electron-vite preview",
+    "build:dir": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win --publish never",
+    "build:mac-unsigned": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac zip --publish never"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.5.2",
+    "electron": "43.0.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "lucide-react": "^0.453.0",
+    "postcss": "^8.5.16",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.19",
+    "vite": "^5.4.21",
+    "@cue/core": "*",
+    "@cue/ui": "*"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "name": "copilot-usage-explorer",
+  "displayName": "Copilot Usage Explorer",
+  "description": "Local viewer for GitHub Copilot Chat agent debug logs (token usage + optimization insights). Auto-discovers sessions from workspaceStorage.",
+  "version": "0.1.0",
+  "publisher": "kevincress",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevrcress/CopilotUsageExplorer.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilotUsageExplorer.open",
+        "title": "Copilot Usage Explorer: Open"
+      }
+    ],
+    "configuration": {
+      "title": "Copilot Usage Explorer",
+      "properties": {
+        "copilotUsageExplorer.cacheBackend": {
+          "type": "string",
+          "enum": [
+            "globalStorage",
+            "indexeddb"
+          ],
+          "default": "globalStorage",
+          "markdownDescription": "Where cached sessions persist. `globalStorage` (default) stores JSON files under the extension's global storage — durability is guaranteed by the VS Code API. `indexeddb` keeps them in the webview's IndexedDB, which is faster but not contract-guaranteed to survive restarts/updates. Reopen the panel after changing."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.webview.json --noEmit",
+    "build:ext": "esbuild src/extension.ts --bundle --platform=node --target=node20 --format=cjs --external:vscode --outfile=dist/extension.js",
+    "build:webview": "vite build",
+    "build": "npm run typecheck && npm run build:ext && npm run build:webview",
+    "package": "npm run build && vsce package --no-dependencies"
+  },
+  "dependencies": {
+    "@cue/core": "*",
+    "@cue/ui": "*",
+    "lucide-react": "^0.453.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@types/vscode": "^1.90.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "@vscode/vsce": "^3.1.0",
+    "autoprefixer": "^10.4.20",
+    "esbuild": "^0.24.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.9"
+  }
+}

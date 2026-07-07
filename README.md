@@ -157,11 +157,20 @@ The parser also detects `"cache_control":{"type":"ephemeral"}` markers inside `u
 
 ---
 
+## Other ways to run it
+
+This is a monorepo: `apps/web` (this browser SPA), `apps/vscode-ext`, and `apps/electron` all share the same `packages/core` (parsing/tokens/insights) and `packages/ui` (components/state).
+
+- **[VS Code extension](apps/vscode-ext/README.md)** — auto-discovers debug logs straight from this machine's `workspaceStorage`, no upload step. Sideloaded `.vsix` from GitHub Releases.
+- **[Desktop app (Electron)](apps/electron/README.md)** — auto-discovers logs across every local VS Code / Insiders / VSCodium / Cursor install, with live tail and auto-update on Windows.
+
+---
+
 ## Stack
 
 TypeScript · React · Vite · Tailwind CSS · shadcn-style UI primitives (Radix UI) · TanStack Table & Virtual · Recharts · Zustand · Dexie · Vitest.
 
-Token counts for the system-prompt and composition views use a `~4 chars/token` heuristic (`src/lib/tokenizer.ts`) — model-accurate tokenizers could be lazy-loaded by extending that module.
+Token counts for the system-prompt and composition views use a `~4 chars/token` heuristic (`packages/core/src/tokenizer.ts`) — model-accurate tokenizers could be lazy-loaded by extending that module.
 
 ---
 

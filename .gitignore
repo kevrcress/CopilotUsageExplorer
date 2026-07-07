@@ -8,6 +8,9 @@ dist-ssr
 coverage
 .env
 .env.local
+*.pem
+*.key
+*.p12
 *.tsbuildinfo
 
 # Real personal Copilot debug logs used for local dev/testing — never commit.
@@ -18,3 +21,15 @@ examples/
 # Not source — a redundant project snapshot and personal training material.
 UpdatedCopilotUsageExplorer.zip
 Copilot 101 And Optimization.pdf
+
+# Extension packaging artifacts
+*.vsix
+
+# Electron build output
+apps/electron/out/
+apps/electron/release/
+
+# HVE tracking: durable artifacts (research/plans/details/changes/reviews/etc.)
+# are committed; only regenerable per-subagent raw output and scratch runs are not.
+.claude-hve-tracking/**/subagents/
+.claude-hve-tracking/sandbox/
