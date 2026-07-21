@@ -2,9 +2,21 @@
 
 > Local, browser-based viewer for **GitHub Copilot Chat agent debug logs** (`main.jsonl`). Built for individual developers who need answers like _"How many tokens did this session burn?"_ and _"Which tool or system-prompt overhead is bloating my requests?"_
 
-🧮 **Tokens, not dollars.** Everything you see is read straight from the debug logs — input/output token counts, turns, LLM calls, tool calls, errors, and AI Credits (when the log reports them). There is no pricing, USD cost, or premium-request estimation anywhere in the app.
+🧮 **Tokens, not dollars.** Everything you see is read straight from the debug logs — input/output token counts, turns, LLM calls, tool calls, errors, and AI Credits (when the log reports them). There is no pricing, USD cost, or premium-request estimation anywhere in the app. Primary input/output/cached counts are the log's own reported values; the few derived views the log doesn't itself tokenize (system-prompt/tools sizing, the input-composition breakdown) fall back to a character-based estimate (~4 chars/token).
 
 🔒 **100% local.** All parsing happens in your browser. No upload, no telemetry, no backend.
+
+🌐 **Live demo:** _<!-- TODO: paste GitHub Pages URL here once the Pages deploy is live -->_ — load your own `main.jsonl`; everything is parsed in-browser and nothing is uploaded.
+
+---
+
+## Screenshots
+
+<!-- Capture instructions and filenames: screenshots/README.md -->
+
+| Sessions list | Session detail | Token / insights charts |
+|---|---|---|
+| ![Sessions tab — one row per session with tokens, AI Credits, and model breakdown](screenshots/session-list.png) | ![Session detail — Conversation tab with chat bubbles and the per-turn context-window chart](screenshots/session-detail.png) | ![Token and optimization insights — daily usage chart and input-composition breakdown](screenshots/insights-charts.png) |
 
 ---
 

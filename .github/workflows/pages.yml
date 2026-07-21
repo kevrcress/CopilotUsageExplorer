@@ -1,0 +1,61 @@
+# Deploy the web SPA (apps/web) to GitHub Pages on every push to main.
+# The app is 100% local-parsing with no backend, so the published bundle has
+# no secret or credential surface. CI (ci.yml) still gates correctness.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least-privilege default; the deploy job elevates only what Pages needs.
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Nothing here launches Electron; skip the ~100 MB binary download.
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        # Project Pages serve under /<repo>/, so the asset base must match the
+        # repo name or the bundle's absolute asset URLs 404. Passed as a CLI
+        # flag so the default (base "/") build used everywhere else is untouched.
+        run: npm run build -w apps/web -- --base=/CopilotUsageExplorer/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # Only the deploy job gets the elevated scopes Pages requires.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
