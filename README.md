@@ -8,6 +8,16 @@
 
 ---
 
+## Screenshots
+
+<!-- Capture instructions and filenames: screenshots/README.md -->
+
+| Sessions list | Session detail | Token / insights charts |
+|---|---|---|
+| ![Sessions tab — one row per session with tokens, AI Credits, and model breakdown](screenshots/session-list.png) | ![Session detail — Conversation tab with chat bubbles and the per-turn context-window chart](screenshots/session-detail.png) | ![Token and optimization insights — daily usage chart and input-composition breakdown](screenshots/insights-charts.png) |
+
+---
+
 ## Quick start
 
 ```bash
