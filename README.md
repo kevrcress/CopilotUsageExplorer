@@ -14,9 +14,13 @@
 
 <!-- Capture instructions and filenames: screenshots/README.md -->
 
-| Sessions list | Session detail | Token / insights charts |
+**Dashboard** — daily token usage, cached-input savings, and top optimization opportunities across every loaded session.
+
+![Dashboard showing total tokens, cached input, LLM calls, a daily token usage chart, top optimization opportunities, and heaviest sessions](screenshots/insights-charts.png)
+
+| Sessions list | Session detail | Context & optimization |
 |---|---|---|
-| ![Sessions tab — one row per session with tokens, AI Credits, and model breakdown](screenshots/session-list.png) | ![Session detail — Conversation tab with chat bubbles and the per-turn context-window chart](screenshots/session-detail.png) | ![Token and optimization insights — daily usage chart and input-composition breakdown](screenshots/insights-charts.png) |
+| ![Sessions tab — one row per session with tokens, AI Credits, and model breakdown](screenshots/session-list.png) | ![Session detail — Conversation tab with chat bubbles and the per-turn context-window chart](screenshots/session-detail.png) | ![Context and optimization tab — input composition donut and per-turn context window growth](screenshots/session-context.png) |
 
 ---
 
