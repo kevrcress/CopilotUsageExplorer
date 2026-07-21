@@ -13,6 +13,7 @@ export interface AppState {
   redact: boolean;
   sizeWarnMb: number;
   loading: boolean;
+  loadingProgress: { sessions: number; bytes: number } | null;
   error: string | null;
   dateRangeStart: number | null; // inclusive lower bound (ms since epoch), null = no lower bound
   dateRangeEnd: number | null;   // inclusive upper bound (ms since epoch), null = now
@@ -46,6 +47,7 @@ export function createAppStore({ cache, prefs }: Pick<HostAdapters, 'cache' | 'p
     redact: false,
     sizeWarnMb: 50,
     loading: true,
+    loadingProgress: null,
     error: null,
     dateRangeStart: thisMonthStart(),
     dateRangeEnd: null,
@@ -57,14 +59,16 @@ export function createAppStore({ cache, prefs }: Pick<HostAdapters, 'cache' | 'p
         const redact = prefs.get<boolean>(REDACT_KEY) ?? false;
         const sizeWarnMb = prefs.get<number>(SIZE_WARN_KEY) ?? 50;
 
-        // Load cached sessions from the host's durable cache.
-        const stored = await cache.list();
+        // Load cached sessions from the host's durable cache. onProgress is a
+        // no-op for hosts that don't stream (Dexie/web, electron); those
+        // resolve directly and loadingProgress stays null throughout.
+        const stored = await cache.list((p) => set({ loadingProgress: p }));
         const sessions: Record<string, ParsedSession> = {};
         for (const s of stored) sessions[s.id] = s;
 
-        set({ workspaceNames, redact, sizeWarnMb, sessions, loading: false });
+        set({ workspaceNames, redact, sizeWarnMb, sessions, loading: false, loadingProgress: null });
       } catch (e) {
-        set({ error: (e as Error).message, loading: false });
+        set({ error: (e as Error).message, loading: false, loadingProgress: null });
       }
     },
 

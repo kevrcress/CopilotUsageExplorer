@@ -13,7 +13,7 @@ import { Button } from './components/ui/button';
 /** The shared app shell. `ingest` is the host-specific ingest panel (browser
  *  drag-drop/file picker in apps/web; message-driven panels elsewhere). */
 export default function App({ ingest }: { ingest: ReactNode }) {
-  const { init, loading, error, sessions, selectedSessionId, selectSession, redact, setRedact } = useAppStore();
+  const { init, loading, loadingProgress, error, sessions, selectedSessionId, selectSession, redact, setRedact } = useAppStore();
   const [tab, setTab] = useState('dashboard');
   const [ingestOpen, setIngestOpen] = useState(false);
 
@@ -27,7 +27,13 @@ export default function App({ ingest }: { ingest: ReactNode }) {
   ).length;
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center text-muted-foreground">Loading…</div>;
+    return (
+      <div className="flex h-screen items-center justify-center text-muted-foreground">
+        {loadingProgress
+          ? `Loading cached sessions… ${loadingProgress.sessions} session${loadingProgress.sessions === 1 ? '' : 's'} · ${(loadingProgress.bytes / 1048576).toFixed(1)} MB`
+          : 'Loading…'}
+      </div>
+    );
   }
   if (error) {
     return <div className="flex h-screen items-center justify-center text-destructive">Error: {error}</div>;

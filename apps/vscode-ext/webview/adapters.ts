@@ -62,8 +62,8 @@ export function createGlobalStorageCache(bridge: Bridge): SessionCache {
     async upsert(s: ParsedSession): Promise<void> {
       await bridge.cacheOp('upsert', { session: s });
     },
-    async list(): Promise<ParsedSession[]> {
-      return ((await bridge.cacheOp('list')) as ParsedSession[]) ?? [];
+    async list(onProgress?: (p: { sessions: number; bytes: number }) => void): Promise<ParsedSession[]> {
+      return ((await bridge.cacheOp('list', undefined, onProgress)) as ParsedSession[]) ?? [];
     },
     async get(id: string): Promise<ParsedSession | undefined> {
       return (await bridge.cacheOp('get', { id })) as ParsedSession | undefined;
