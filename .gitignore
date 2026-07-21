@@ -14,8 +14,11 @@ coverage
 *.tsbuildinfo
 
 # Real personal Copilot debug logs used for local dev/testing — never commit.
-# Sample data for the app lives in Examples/ (tracked); this is a separate,
-# real-data folder that must stay private.
+# They contain source code and conversation content.
+# NOTE: macOS is case-insensitive, so Examples/ and examples/ are the SAME
+# directory. There is no separate tracked sample-data folder — tests use
+# fixtures in packages/core/test/fixtures/. Do not "fix" this by force-adding
+# Examples/; that would publish real logs.
 examples/
 
 # Not source — a redundant project snapshot and personal training material.
