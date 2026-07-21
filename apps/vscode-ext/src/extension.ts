@@ -6,7 +6,8 @@ import {
   readWorkspaceBuckets,
   type DiscoveredWorkspace,
 } from './discovery';
-import { handleCacheOp } from './file-cache';
+import { handleCacheOp, iterateExportSegments, iterateSessionPayloads } from './file-cache';
+import { streamBatches } from './frame-batch';
 import { createLogger, type Logger } from './logger';
 import {
   MAX_MESSAGE_BYTES,
@@ -150,7 +151,15 @@ class ExplorerPanel {
   // -------------------------------------------------------------------------
 
   private post(msg: ExtToWebviewMessage): void {
-    if (!this.disposed) void this.panel.webview.postMessage(msg);
+    if (this.disposed) return;
+    this.panel.webview.postMessage(msg).then(
+      (ok) => {
+        if (!ok) this.log.warn(`postMessage(${msg.type}) not delivered`);
+      },
+      (e: unknown) => {
+        this.log.warn(`postMessage(${msg.type}) failed: ${(e as Error).message}`);
+      }
+    );
   }
 
   private async onMessage(msg: WebviewToExtMessage): Promise<void> {
@@ -174,6 +183,14 @@ class ExplorerPanel {
         await this.context.workspaceState.update(msg.key, msg.value);
         return;
       case 'cacheOp': {
+        if (msg.op === 'list') {
+          await this.streamList(msg.requestId);
+          return;
+        }
+        if (msg.op === 'export') {
+          await this.streamExport(msg.requestId);
+          return;
+        }
         try {
           const data = await handleCacheOp(this.context, msg);
           this.post({ type: 'cacheResult', requestId: msg.requestId, ok: true, data });
@@ -182,6 +199,60 @@ class ExplorerPanel {
         }
         return;
       }
+    }
+  }
+
+  /** Stream `list` replies as `cacheResultChunk` frames instead of one
+   *  `cacheResult` (Phase 2): a cache whose serialized size exceeds
+   *  MAX_MESSAGE_BYTES would otherwise never be delivered by postMessage,
+   *  leaving the webview's cacheOp promise pending forever. Frames post as
+   *  soon as they fill, keeping the bridge's inactivity timeout fed during a
+   *  long disk read (details doc §3). */
+  private async streamList(requestId: number): Promise<void> {
+    let sessionCount = 0;
+    let totalBytes = 0;
+    let frameCount = 0;
+    try {
+      await streamBatches(
+        iterateSessionPayloads(this.context),
+        (payload) => JSON.stringify(payload).length,
+        MAX_MESSAGE_BYTES,
+        (frame, done, bytes) => {
+          sessionCount += frame.length;
+          totalBytes += bytes;
+          frameCount++;
+          this.post({ type: 'cacheResultChunk', requestId, items: frame, done, bytes });
+        }
+      );
+      this.log.info(
+        `cacheOp 'list' reply size: ${totalBytes} bytes, ${sessionCount} session(s), ${frameCount} frame(s)`
+      );
+    } catch (e) {
+      this.post({ type: 'cacheResult', requestId, ok: false, error: (e as Error).message });
+    }
+  }
+
+  /** Stream `export` replies as `cacheResultChunk` frames of JSON string
+   *  segments; the bridge concatenates them back into the same
+   *  `{"version":1,...}` export document (details doc §5, preferred
+   *  approach — chunked rather than the single-frame-with-warning fallback). */
+  private async streamExport(requestId: number): Promise<void> {
+    let totalBytes = 0;
+    let frameCount = 0;
+    try {
+      await streamBatches(
+        iterateExportSegments(this.context),
+        (segment) => segment.length,
+        MAX_MESSAGE_BYTES,
+        (frame, done, bytes) => {
+          totalBytes += bytes;
+          frameCount++;
+          this.post({ type: 'cacheResultChunk', requestId, items: frame, done, bytes });
+        }
+      );
+      this.log.info(`cacheOp 'export' reply size: ${totalBytes} bytes, ${frameCount} frame(s)`);
+    } catch (e) {
+      this.post({ type: 'cacheResult', requestId, ok: false, error: (e as Error).message });
     }
   }
 

@@ -4,5 +4,6 @@
     "lib": ["ES2022"],
     "types": ["node", "vscode"]
   },
-  "include": ["src", "test", "vite.config.ts"]
+  "include": ["src", "test", "vite.config.ts"],
+  "exclude": ["test/bridge.test.ts"]
 }

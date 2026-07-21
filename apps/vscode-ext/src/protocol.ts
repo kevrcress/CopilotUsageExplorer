@@ -50,6 +50,20 @@ export type ExtToWebviewMessage =
     }
   | { type: 'saveResult'; requestId: number; ok: boolean; error?: string }
   | { type: 'cacheResult'; requestId: number; ok: boolean; data?: unknown; error?: string }
+  | {
+      /** Escape hatch for cacheOp replies over MAX_MESSAGE_BYTES (`list`,
+       *  `export`): streamed in requestId-correlated frames instead of one
+       *  `cacheResult` (details doc §2). `items` is ParsedSession-shaped
+       *  payloads for `list`, or string segments to concatenate for `export`.
+       *  `bytes` is the frame's serialized-size estimate, for Phase 3's
+       *  loading-progress UI — free to compute since streaming already
+       *  measures it per frame. */
+      type: 'cacheResultChunk';
+      requestId: number;
+      items: unknown[];
+      done: boolean;
+      bytes?: number;
+    }
   | { type: 'status'; message: string };
 
 // ---------------------------------------------------------------------------

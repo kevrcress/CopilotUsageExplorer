@@ -35,25 +35,57 @@ function fileNameFor(id: string): string {
   return `${id.replace(/[^a-zA-Z0-9._-]/g, '_')}.json`;
 }
 
-async function readAll(context: vscode.ExtensionContext): Promise<StoredSession[]> {
+/** Stream stored sessions file-by-file rather than reading the whole
+ *  directory into memory first, so `list`/`export` streaming (extension.ts
+ *  streamList/streamExport) can post a cacheResultChunk frame the moment
+ *  enough sessions have accumulated — the point being continuous progress
+ *  during a long disk read, not just a smaller final payload.
+ *
+ *  DD: yields in `fs.readdir` order rather than reusing readAll's
+ *  newest-first (`startedAt` descending) sort. Preserving that sort would
+ *  require reading every file before any could be yielded, defeating the
+ *  purpose of streaming. store.ts keys the result by session id into a
+ *  `Record`, so response order doesn't affect app behavior — dropping the
+ *  ordering guarantee here is safe (plan Step 2.2 permits this explicitly). */
+export async function* iterateSessions(context: vscode.ExtensionContext): AsyncGenerator<StoredSession> {
   const dir = sessionsDir(context);
   let names: string[] = [];
   try {
     names = await fs.readdir(dir);
   } catch {
-    return [];
+    return;
   }
-  const out: StoredSession[] = [];
   for (const name of names) {
     if (!name.endsWith('.json')) continue;
     try {
-      out.push(JSON.parse(await fs.readFile(path.join(dir, name), 'utf8')) as StoredSession);
+      const raw = await fs.readFile(path.join(dir, name), 'utf8');
+      yield JSON.parse(raw) as StoredSession;
     } catch {
       // skip corrupt entries rather than failing the whole list
     }
   }
-  out.sort((a, b) => b.startedAt - a.startedAt);
-  return out;
+}
+
+/** `list` streaming source: session payloads only, in `iterateSessions` order. */
+export async function* iterateSessionPayloads(
+  context: vscode.ExtensionContext
+): AsyncGenerator<SessionPayload> {
+  for await (const row of iterateSessions(context)) yield row.payload;
+}
+
+/** `export` streaming source: string segments that concatenate (in order)
+ *  into the same JSON shape `export` always produced —
+ *  `{"version":1,"exportedAt":…,"sessions":[…]}` — built incrementally so no
+ *  single string ever holds the whole export in memory (details doc §5,
+ *  preferred approach). */
+export async function* iterateExportSegments(context: vscode.ExtensionContext): AsyncGenerator<string> {
+  yield `{"version":1,"exportedAt":${Date.now()},"sessions":[`;
+  let first = true;
+  for await (const row of iterateSessions(context)) {
+    yield (first ? '' : ',') + JSON.stringify(row);
+    first = false;
+  }
+  yield ']}';
 }
 
 async function writeOne(context: vscode.ExtensionContext, row: StoredSession): Promise<void> {
@@ -80,16 +112,19 @@ function toRow(payload: SessionPayload): StoredSession {
   };
 }
 
+/** Ops handled via the single-frame `cacheResult` reply. `list` and `export`
+ *  are excluded — their replies can exceed MAX_MESSAGE_BYTES, so
+ *  extension.ts streams them directly via iterateSessionPayloads /
+ *  iterateExportSegments instead of routing through here. */
+export type SingleFrameCacheOp = Exclude<CacheOp, { op: 'list' } | { op: 'export' }>;
+
 /** Execute one webview cacheOp against the globalStorage file cache.
  *  Returns the `data` value for the cacheResult reply. */
-export async function handleCacheOp(context: vscode.ExtensionContext, msg: CacheOp): Promise<unknown> {
+export async function handleCacheOp(context: vscode.ExtensionContext, msg: SingleFrameCacheOp): Promise<unknown> {
   switch (msg.op) {
     case 'upsert': {
       await writeOne(context, toRow(msg.session as SessionPayload));
       return undefined;
-    }
-    case 'list': {
-      return (await readAll(context)).map((r) => r.payload);
     }
     case 'get': {
       return (await readOne(context, msg.id))?.payload;
@@ -109,10 +144,6 @@ export async function handleCacheOp(context: vscode.ExtensionContext, msg: Cache
         // already gone
       }
       return undefined;
-    }
-    case 'export': {
-      const all = await readAll(context);
-      return JSON.stringify({ version: 1, exportedAt: Date.now(), sessions: all });
     }
     case 'import': {
       const data = JSON.parse(msg.json) as { sessions?: StoredSession[] };
