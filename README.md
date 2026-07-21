@@ -6,7 +6,7 @@
 
 🔒 **100% local.** All parsing happens in your browser. No upload, no telemetry, no backend.
 
-🌐 **Live demo:** _<!-- TODO: paste GitHub Pages URL here once the Pages deploy is live -->_ — load your own `main.jsonl`; everything is parsed in-browser and nothing is uploaded.
+🌐 **Live demo:** **<https://kevrcress.github.io/CopilotUsageExplorer/>** — load your own `main.jsonl`; everything is parsed in-browser and nothing is uploaded.
 
 ---
 
