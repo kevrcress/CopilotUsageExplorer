@@ -41,12 +41,13 @@ function fileNameFor(id: string): string {
  *  enough sessions have accumulated — the point being continuous progress
  *  during a long disk read, not just a smaller final payload.
  *
- *  DD: yields in `fs.readdir` order rather than reusing readAll's
- *  newest-first (`startedAt` descending) sort. Preserving that sort would
+ *  DD: yields in `fs.readdir` order. The pre-streaming implementation sorted
+ *  newest-first (`startedAt` descending), but preserving that sort would
  *  require reading every file before any could be yielded, defeating the
  *  purpose of streaming. store.ts keys the result by session id into a
  *  `Record`, so response order doesn't affect app behavior — dropping the
- *  ordering guarantee here is safe (plan Step 2.2 permits this explicitly). */
+ *  ordering guarantee here is safe (plan Step 2.2 permits this explicitly,
+ *  and packages/ui/test/store.test.ts pins the order-independence). */
 export async function* iterateSessions(context: vscode.ExtensionContext): AsyncGenerator<StoredSession> {
   const dir = sessionsDir(context);
   let names: string[] = [];

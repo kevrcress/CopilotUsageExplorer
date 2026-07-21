@@ -4,7 +4,12 @@ import type { ParsedSession, RecoveredFile } from '@cue/core';
  *  Dexie; other hosts may use extension globalStorage, etc.). */
 export interface SessionCache {
   upsert(s: ParsedSession): Promise<void>;
-  /** onProgress is an optional per-chunk callback for hosts that stream the
+  /** Resolution order is NOT guaranteed — the VS Code globalStorage adapter
+   *  streams sessions in filesystem order so it can post frames during the
+   *  disk read rather than after it. Callers must key by `id` (as store.ts
+   *  does) or sort explicitly; never render the result as-is.
+   *
+   *  onProgress is an optional per-chunk callback for hosts that stream the
    *  reply (VS Code globalStorage); Dexie/web adapters ignore it and resolve
    *  directly (Phase 3 loading-progress UI, details doc §8). */
   list(onProgress?: (p: { sessions: number; bytes: number }) => void): Promise<ParsedSession[]>;
