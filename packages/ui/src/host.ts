@@ -4,10 +4,9 @@ import type { ParsedSession, RecoveredFile } from '@cue/core';
  *  Dexie; other hosts may use extension globalStorage, etc.). */
 export interface SessionCache {
   upsert(s: ParsedSession): Promise<void>;
-  /** Resolution order is NOT guaranteed — the VS Code globalStorage adapter
-   *  streams sessions in filesystem order so it can post frames during the
-   *  disk read rather than after it. Callers must key by `id` (as store.ts
-   *  does) or sort explicitly; never render the result as-is.
+  /** Resolves newest-first (`startedAt` descending). Every adapter owes this
+   *  guarantee: Dexie gets it from its index, the VS Code globalStorage
+   *  adapter sorts on arrival because it streams in filesystem order.
    *
    *  onProgress is an optional per-chunk callback for hosts that stream the
    *  reply (VS Code globalStorage); Dexie/web adapters ignore it and resolve

@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Shared React UI for Copilot Usage Explorer. Host-specific IO lives behind the adapter interfaces in src/host.ts.",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./adapters/dexie-cache": "./src/adapters/dexie-cache.ts"

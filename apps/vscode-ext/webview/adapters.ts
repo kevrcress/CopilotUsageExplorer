@@ -62,8 +62,16 @@ export function createGlobalStorageCache(bridge: Bridge): SessionCache {
     async upsert(s: ParsedSession): Promise<void> {
       await bridge.cacheOp('upsert', { session: s });
     },
+    /** Sorts newest-first to honor the SessionCache.list contract. The wire
+     *  format arrives in filesystem order — the extension streams sessions as
+     *  it reads them so frames keep flowing during a long disk read (src/
+     *  file-cache.ts iterateSessions) — so the order is restored here, once
+     *  every frame is in. Sorting an already-materialized array costs nothing
+     *  next to the parse, and doing it here rather than extension-side keeps
+     *  the streaming property intact. */
     async list(onProgress?: (p: { sessions: number; bytes: number }) => void): Promise<ParsedSession[]> {
-      return ((await bridge.cacheOp('list', undefined, onProgress)) as ParsedSession[]) ?? [];
+      const sessions = ((await bridge.cacheOp('list', undefined, onProgress)) as ParsedSession[]) ?? [];
+      return sessions.sort((a, b) => b.startedAt - a.startedAt);
     },
     async get(id: string): Promise<ParsedSession | undefined> {
       return (await bridge.cacheOp('get', { id })) as ParsedSession | undefined;

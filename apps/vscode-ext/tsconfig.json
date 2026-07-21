@@ -4,6 +4,10 @@
     "lib": ["ES2022"],
     "types": ["node", "vscode"]
   },
+  // test/webview/** is excluded by convention: those tests import webview code
+  // needing the DOM lib and JSX, which only tsconfig.webview.json provides.
+  // Put a test there and it is type-checked under that config instead — no
+  // per-file routing needed in either tsconfig.
   "include": ["src", "test", "vite.config.ts"],
-  "exclude": ["test/bridge.test.ts"]
+  "exclude": ["test/webview"]
 }

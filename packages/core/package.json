@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Pure parsing/insights core for Copilot Usage Explorer. No React, no DOM, no storage.",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./node-fs-utils": "./src/node-fs-utils.ts"

@@ -3,12 +3,11 @@ import type { ParsedSession } from '@cue/core';
 import { createAppStore } from '../src/store';
 import type { PrefsStore, SessionCache } from '../src/host';
 
-/** SessionCache.list makes no ordering guarantee: the VS Code globalStorage
- *  adapter streams sessions in filesystem (readdir) order so it can post
- *  frames during the disk read instead of after it (apps/vscode-ext/src/
- *  file-cache.ts iterateSessions). These tests pin the property that makes
- *  that safe — init() keys results by id, so any order yields the same store
- *  state. If someone later makes init() order-sensitive, this fails. */
+/** SessionCache.list resolves newest-first, and each adapter owes that
+ *  guarantee (apps/vscode-ext/test/adapters.test.ts pins the streaming one).
+ *  These tests cover the second line of defense: init() keys results by id, so
+ *  store state is identical whatever order an adapter hands back — which is
+ *  what stops an adapter-side ordering bug from corrupting the store. */
 
 function session(id: string, startedAt: number): ParsedSession {
   // Only the fields init() actually touches need to be real; the rest of

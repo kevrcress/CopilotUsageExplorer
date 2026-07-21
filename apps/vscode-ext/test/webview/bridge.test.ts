@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import type { WebviewToExtMessage } from '../src/protocol';
+import type { WebviewToExtMessage } from '../../src/protocol';
 
 /** bridge.ts acquires its VS Code API singleton at module load time via a
  *  global `acquireVsCodeApi()` (declared `declare function acquireVsCodeApi`)
@@ -39,7 +39,7 @@ function installFakeHost(): { postMessage: ReturnType<typeof vi.fn>; getHandler:
 async function loadBridge() {
   vi.resetModules();
   const host = installFakeHost();
-  const mod = await import('../webview/bridge');
+  const mod = await import('../../webview/bridge');
   return { ...host, createBridge: mod.createBridge };
 }
 

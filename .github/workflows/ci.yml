@@ -42,6 +42,11 @@ jobs:
       - name: Build web app
         run: npm run build -w apps/web
 
+      - name: Typecheck shared packages
+        run: |
+          npm run typecheck -w packages/core
+          npm run typecheck -w packages/ui
+
       - name: Typecheck VS Code extension
         run: npm run typecheck -w apps/vscode-ext
 
